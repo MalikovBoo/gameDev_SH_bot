@@ -31,7 +31,7 @@ language_keyboard.add(InlineKeyboardButton("English🇬🇧", callback_data='en'
 
 
 async def send_message(user_id, message_key):
-    language = user_languages.get(user_id, 'en')  # Default to English
+    language = user_languages.get(user_id, 'ru')  # Default to Russian
     message_template = message_templates[language][message_key]
     await bot.send_message(user_id, message_template)
 
@@ -42,7 +42,7 @@ async def language_cmd(message: types.Message):
                            reply_markup=language_keyboard)
 
 
-@dp.callback_query_handler(lambda c: c.data in ['en', 'ru'])
+@dp.callback_query_handler(lambda c: c.data in ['ru'])
 async def process_callback(callback_query: types.CallbackQuery):
     user_languages[callback_query.from_user.id] = callback_query.data
     await bot.answer_callback_query(callback_query.id)
@@ -65,7 +65,7 @@ async def start_cmd(message: types.Message):
     try:
         username = message.from_user.username
         messages[username] = []
-        language = user_languages.get(message.from_user.id, 'en')  # Get the selected language
+        language = user_languages.get(message.from_user.id, 'ru')  # Get the selected language
         await message.reply(message_templates[language]['start'])  # Retrieve the correct message based on the language
     except Exception as e:
         logging.error(f'Error in start_cmd: {e}')
@@ -76,7 +76,7 @@ async def new_topic_cmd(message: types.Message):
     try:
         userid = message.from_user.id
         messages[str(userid)] = []
-        language = user_languages.get(message.from_user.id, 'en')
+        language = user_languages.get(message.from_user.id, 'ru')
         await message.reply(message_templates[language]['newtopic'])
     except Exception as e:
         logging.error(f'Error in new_topic_cmd: {e}')
@@ -86,7 +86,7 @@ async def new_topic_cmd(message: types.Message):
 async def send_image(message: types.Message):
     try:
         description = message.text.replace('/image', '').strip()
-        language = user_languages.get(message.from_user.id, 'en')
+        language = user_languages.get(message.from_user.id, 'ru')
         if not description:
             await message.reply(message_templates[language]['image_prompt'])
             return
@@ -101,13 +101,13 @@ async def send_image(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def help_cmd(message: types.Message):
-    language = user_languages.get(message.from_user.id, 'en')
+    language = user_languages.get(message.from_user.id, 'ru')
     await message.reply(message_templates[language]['help'])
 
 
 @dp.message_handler(commands=['about'])
 async def about_cmd(message: types.Message):
-    language = user_languages.get(message.from_user.id, 'en')
+    language = user_languages.get(message.from_user.id, 'ru')
     await message.reply(message_templates[language]['about'])
 
 
@@ -127,7 +127,7 @@ async def echo_msg(message: types.Message):
         should_respond = not message.reply_to_message or message.reply_to_message.from_user.id == bot.id
 
         if should_respond:
-            language = user_languages.get(message.from_user.id, 'en')
+            language = user_languages.get(message.from_user.id, 'ru')
             processing_message = await message.reply(message_templates[language]['processing'])
 
             await bot.send_chat_action(chat_id=message.chat.id, action="typing")
@@ -152,7 +152,7 @@ async def echo_msg(message: types.Message):
 
     except Exception as ex:
         if ex == "context_length_exceeded":
-            language = user_languages.get(message.from_user.id, 'en')
+            language = user_languages.get(message.from_user.id, 'ru')
             await message.reply(message_templates[language]['error'])
             await new_topic_cmd(message)
             await echo_msg(message)
