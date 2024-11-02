@@ -15,6 +15,7 @@ jobs:
 
     - name: Add SSH key
       run: |
+        mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github
         chmod 600 ~/.ssh/id_rsa_github
         ssh-keyscan -H 185.156.110.29 >> ~/.ssh/known_hosts
