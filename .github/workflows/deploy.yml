@@ -13,12 +13,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Add SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_github
+        chmod 600 ~/.ssh/id_rsa_github
+        ssh-keyscan -H 185.156.110.29 >> ~/.ssh/known_hosts
+      shell: bash
+
     - name: Sync files to VPS
       run: |
-        rsync -avz --exclude '.env' --exclude 'venv' -e "ssh -o StrictHostKeyChecking=no" ./ root@185.156.110.29:/root/SH_assist_bot/
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    
+        rsync -avz --exclude '.env' --exclude 'venv' -e "ssh -i ~/.ssh/id_rsa_github -o StrictHostKeyChecking=no" ./ root@185.156.110.29:/root/SH_assist_bot/
+
     - name: Restart bot service
       run: |
-        ssh -o StrictHostKeyChecking=no root@185.156.110.29 "sudo systemctl restart sh_tg_bot"
+        ssh -i ~/.ssh/id_rsa_github -o StrictHostKeyChecking=no root@185.156.110.29 "sudo systemctl restart sh_tg_bot"
